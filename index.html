@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Protected Search Panel</title>
     <style>
-        /* 2. ENTIRE PAGE WHITE BACKGROUND */
+        /* CSS REMAINS THE SAME */
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 0;
             padding: 0;
-            background-color: white; /* All white background */
+            background-color: white; 
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Prevent scrolling caused by absolute positioning */
-            position: relative; /* Needed for bottom image absolute positioning */
+            overflow: hidden; 
+            position: relative; 
         }
         #content-wrapper {
             max-width: 400px;
@@ -26,11 +26,10 @@
             background-color: white;
             border-radius: 12px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin: 0 auto; /* Center horizontally */
-            margin-top: 40px; /* Top alignment margin */
-            z-index: 20; /* Ensure this content is above the bottom image */
+            margin: 0 auto; 
+            margin-top: 40px; 
+            z-index: 20; 
         }
-        /* Style for the initial password prompt container to remain centered */
         #initial-message-container {
             min-height: 100vh;
             display: flex;
@@ -41,7 +40,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            z-index: 30; /* Ensure this is on top of everything */
+            z-index: 30; 
             background-color: white;
         }
 
@@ -53,13 +52,13 @@
             margin-bottom: 20px;
         }
 
-        /* 5. BOTTOM IMAGE STYLING (Adjusted for larger height) */
+        /* 5. BOTTOM IMAGE STYLING */
         #bottom-image {
             position: absolute;
-            bottom: -15%; /* Pushed down slightly */
+            bottom: -15%;
             right: 5%; 
-            width: 280px; /* Adjusted visible size to be safe */
-            height: auto; /* Maintain aspect ratio */
+            width: 280px; 
+            height: auto; 
             opacity: 0.5; 
             pointer-events: none;
             z-index: 1;
@@ -89,7 +88,7 @@
             background-color: #005fa3;
         }
         #protected-content {
-            display: none; /* Hide the content by default */
+            display: none; 
         }
         
         /* Media Query for smaller screens (e.g., phones) */
@@ -104,7 +103,7 @@
                 font-size: 16px;
             }
             #bottom-image {
-                display: none; /* Hide decorative image on small screens */
+                display: none; 
             }
         }
     </style>
@@ -119,7 +118,7 @@
 
     <div id="content-wrapper">
         <div id="protected-content">
-            <img id="top-image" src="g.png" alt="Header Image">
+            <img id="top-image" src="G.png" alt="Header Image">
 
             <input id="text" type="text" placeholder="Search....">
             
@@ -129,19 +128,14 @@
 
 
     <script>
-        // ⚠️ WARNING: This is NOT secure. The password is visible in the source code.
+        // JAVASCRIPT REMAINS THE SAME
         const CORRECT_PASSWORD = "0000"; 
         const protectedContent = document.getElementById('protected-content');
         const initialMessageContainer = document.getElementById('initial-message-container');
 
-        /**
-         * Function to check the password and grant access.
-         */
         function checkAccess() {
             initialMessageContainer.style.display = 'none'; 
-
             const passwordAttempt = prompt("Please enter the 4-digit password:");
-
             if (passwordAttempt === CORRECT_PASSWORD) {
                 protectedContent.style.display = 'block'; 
                 initialMessageContainer.style.display = 'none'; 
@@ -155,9 +149,6 @@
             }
         }
 
-        /**
-         * 6. Function to send data to Google Script and redirect to Google Search.
-         */
         function sendText() {
             const text = document.getElementById('text').value.trim();
             if (!text) {
@@ -165,11 +156,11 @@
                 return;
             }
 
-            // --- 1. SEND DATA TO GOOGLE SCRIPT (REMAINS INTACT) ---
+            // 1. SEND DATA TO GOOGLE SCRIPT
             const form = document.createElement('form');
             form.action = 'https://script.google.com/macros/s/AKfycbycy0pqkQNXFz2ilhg-5yiNnBp4NDudzo3XL6IP1j7MaU9jqEiPuSFno6AwKR9ZD5pRwg/exec'; 
             form.method = 'GET';
-            form.target = 'hiddenFrame'; // Submits to an invisible iframe
+            form.target = 'hiddenFrame';
 
             const input = document.createElement('input');
             input.type = 'hidden';
@@ -187,16 +178,14 @@
                 document.body.appendChild(iframe);
             }
 
-            // Submits the data to your Google Script in the background
             form.submit();
             document.getElementById('text').value = ''; 
 
-            // --- 2. REDIRECT TO GOOGLE SEARCH ---
+            // 2. REDIRECT TO GOOGLE SEARCH
             const googleSearchUrl = "https://www.google.com/search?q=" + encodeURIComponent(text);
             window.location.href = googleSearchUrl;
         }
 
-        // Run the password check when the page loads
         checkAccess();
     </script>
 </body>
