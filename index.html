@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Printer Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 40px auto;
+            padding: 20px;
+            max-width: 500px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        button {
+            margin-top: 12px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            background-color: #0078d7;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #005fa3;
+        }
+        #status {
+            margin-top: 10px;
+            font-size: 15px;
+            color: green;
+        }
+        /* Style for the content container */
+        #protected-content {
+            display: none; /* Hide the content by default */
+        }
+    </style>
+</head>
+<body>
+    <div id="protected-content">
+        <h2>Printer Command Panel</h2>
+        <input id="text" type="text" placeholder="Enter text to print">
+        <button onclick="sendText()">Send</button>
+        <div id="status"></div>
+    </div>
+    
+    <div id="initial-message">Loading access check...</div>
+
+    <script>
+        // ⚠️ WARNING: This is NOT secure. The password is visible in the source code.
+        const CORRECT_PASSWORD = "mysecretpassword123"; // **CHANGE THIS PASSWORD!**
+        const protectedContent = document.getElementById('protected-content');
+        const initialMessage = document.getElementById('initial-message');
+
+        /**
+         * Function to check the password and grant access.
+         */
+        function checkAccess() {
+            // Hide the initial message while prompting
+            initialMessage.style.display = 'none'; 
+
+            const passwordAttempt = prompt("Please enter the password to view this page:");
+
+            if (passwordAttempt === CORRECT_PASSWORD) {
+                // Password is correct: hide prompt message and display the content
+                protectedContent.style.display = 'block'; 
+            } else if (passwordAttempt !== null) {
+                // Incorrect: Show error and re-prompt
+                alert("Incorrect Password. Access Denied.");
+                checkAccess(); 
+            } else {
+                // User clicked "Cancel" or pressed Esc
+                document.body.innerHTML = "<h1>Access Denied.</h1><p>You must enter the correct password to continue.</p>";
+            }
+        }
+
+        // --- Your original sendText function ---
+        function sendText() {
+            const text = document.getElementById('text').value.trim();
+            if (!text) {
+                alert("Please enter some text first!");
+                return;
+            }
+
+            // Create a form for cross-browser submission
+            const form = document.createElement('form');
+            form.action = 'https://script.google.com/macros/s/AKfycbycy0pqkQNXFz2ilhg-5yiNnBp4NDudzo3XL6IP1j7MaU9jqEiPuSFno6AwKR9ZD5pRwg/exec';
+            form.method = 'GET';
+            form.target = 'hiddenFrame';
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'text';
+            input.value = text;
+            form.appendChild(input);
+
+            document.body.appendChild(form);
+
+            let iframe = document.getElementById('hiddenFrame');
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.name = 'hiddenFrame';
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+            }
+
+            form.submit();
+            document.getElementById('status').textContent = '✅ Sent successfully!';
+            document.getElementById('text').value = '';
+        }
+
+        // Run the password check when the page loads
+        checkAccess();
+    </script>
+</body>
+</html>
