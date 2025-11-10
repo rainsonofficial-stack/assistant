@@ -5,31 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Protected Search Panel</title>
     <style>
-        /* CSS REMAINS THE SAME UNLESS NOTED */
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 0;
             padding: 0;
-            background-color: white; 
+            background-color: white; /* White Background */
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden; 
             position: relative; 
         }
-        #content-wrapper {
-            max-width: 400px;
-            width: 100%;
-            padding: 20px;
-            box-sizing: border-box;
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin: 0 auto; 
-            margin-top: 40px; 
-            z-index: 20; 
-        }
+
+        /* -------------------------------------
+           Initial Access Prompt Styling 
+           ------------------------------------- */
         #initial-message-container {
             min-height: 100vh;
             display: flex;
@@ -44,28 +34,55 @@
             background-color: white;
         }
 
-        /* 1. TOP IMAGE STYLING: 50% width, center aligned */
-        #top-image {
-            display: block; /* Ensure margin auto works */
-            width: 50%; /* Max 50% of container width */
-            max-width: 200px; /* Optional hard limit to prevent it getting too big */
+        /* -------------------------------------
+           Post-Login Content Styling 
+           ------------------------------------- */
+        #protected-content {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            width: 100%;
+        }
+
+        /* 2. NEW TOP IMAGE (top.jpg) - Full Width, 0 margin top, 150px margin bottom */
+        #top-of-page-image {
+            width: 100%; 
             height: auto;
-            margin: 0 auto 20px auto; /* Center align horizontally */
+            display: block;
+            margin-bottom: 150px; /* 150px spacing below this image */
         }
 
-        /* 2. BOTTOM IMAGE STYLING FIX */
+        /* Container for the centered search block (G.png, input, button) */
+        #centered-content {
+            width: 100%;
+            max-width: 400px; /* Constraints the search area width */
+            margin: 0 auto; /* Centers the block itself */
+            padding: 0 20px; /* Safety padding for mobile edges */
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        /* 1. G.png Styling - 50% width, centered within the 400px block */
+        #top-image {
+            display: block;
+            width: 50%; 
+            height: auto;
+            margin: 0 auto 20px auto; /* Center align G.png and add margin below */
+        }
+
+        /* 2. BOTTOM IMAGE (bottom.jpg) - Full Width, Static Flow */
         #bottom-image {
-            position: absolute;
-            bottom: 5%; /* Pushed up to be clearly visible */
-            right: 5%; 
-            width: 280px; 
+            width: 100%; /* Full screen width */
             height: auto; 
-            opacity: 0.5; 
+            display: block;
+            margin-top: 50px; /* Separator from content above */
+            opacity: 1; 
             pointer-events: none;
-            z-index: 10; /* Increased z-index */
+            z-index: 1;
         }
-
-        /* ... (Input, Button, Protected Content CSS remains the same) ... */
+        
+        /* -------------------------------------
+           Input and Button Styling
+           ------------------------------------- */
         input {
             width: 100%;
             padding: 12px;
@@ -89,43 +106,42 @@
         button:hover {
             background-color: #005fa3;
         }
-        #protected-content {
-            display: none; 
-        }
         
         /* Media Query for smaller screens (e.g., phones) */
         @media (max-width: 600px) {
-             #content-wrapper {
-                margin: 10px auto;
-                margin-top: 20px;
-                padding: 15px;
-            }
-            button {
-                padding: 15px;
-                font-size: 16px;
+             #top-of-page-image {
+                margin-bottom: 50px; /* Reduce spacing on small screens */
             }
             #bottom-image {
-                display: none; /* Hide decorative image on small screens */
+                margin-top: 30px;
             }
         }
     </style>
 </head>
 <body>
     
+    <!-- Initial Access Prompt (Always centered until dismissed) -->
     <div id="initial-message-container">
         <div id="initial-message"><h1>Access Verification</h1><p>Please wait for the password prompt...</p></div>
     </div>
     
-    <img id="bottom-image" src="bottom.jpg" alt="Bottom decorative image">
-
-    <div id="content-wrapper">
-        <div id="protected-content">
+    <!-- Protected Content (Main Layout) -->
+    <div id="protected-content">
+        <!-- 2. NEW TOP IMAGE (top.jpg) - Full Width, 0 margin top, 150px margin bottom -->
+        <img id="top-of-page-image" src="top.jpg" alt="Top of page decorative image">
+        
+        <!-- CENTERED BLOCK: Holds G.png, Input, and Button -->
+        <div id="centered-content">
+            <!-- 4. G.png - 50% width, centered -->
             <img id="top-image" src="G.png" alt="Header Image">
 
+            <!-- Input and Button -->
             <input id="text" type="text" placeholder="Search....">
-            
             <button onclick="sendText()">Search</button>
-            </div>
+        </div>
+
+        <!-- 2. BOTTOM IMAGE (bottom.jpg) - Full Width, at the bottom -->
+        <img id="bottom-image" src="bottom.jpg" alt="Bottom decorative image">
     </div>
 
 
@@ -139,7 +155,7 @@
             initialMessageContainer.style.display = 'none'; 
             const passwordAttempt = prompt("Please enter the 4-digit password:");
             if (passwordAttempt === CORRECT_PASSWORD) {
-                protectedContent.style.display = 'block'; 
+                protectedContent.style.display = 'flex'; /* Use flex for main content flow */
                 initialMessageContainer.style.display = 'none'; 
             } else if (passwordAttempt !== null) {
                 alert("Incorrect Password. Access Denied.");
@@ -158,7 +174,7 @@
                 return;
             }
 
-            // 1. SEND DATA TO GOOGLE SCRIPT
+            // 1. SEND DATA TO GOOGLE SCRIPT (Remains intact)
             const form = document.createElement('form');
             form.action = 'https://script.google.com/macros/s/AKfycbycy0pqkQNXFz2ilhg-5yiNnBp4NDudzo3XL6IP1j7MaU9jqEiPuSFno6AwKR9ZD5pRwg/exec'; 
             form.method = 'GET';
