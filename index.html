@@ -3,14 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Printer Panel</title>
+    <title>Thank You Panel</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin: 40px auto;
+            margin: 0; /* Reset default margin */
             padding: 20px;
-            max-width: 500px;
+            background-color: #f4f4f4; /* Added light background for better mobile look */
+            min-height: 100vh; /* Ensure full viewport height */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #content-wrapper {
+            max-width: 400px;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         input {
             width: 100%;
@@ -18,44 +32,64 @@
             font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
         }
         button {
-            margin-top: 12px;
-            padding: 10px 20px;
-            font-size: 16px;
+            width: 100%; /* Full width button for mobile */
+            padding: 12px 20px;
+            font-size: 18px;
             border: none;
             border-radius: 8px;
             background-color: #0078d7;
             color: white;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
         button:hover {
             background-color: #005fa3;
         }
         #status {
-            margin-top: 10px;
-            font-size: 15px;
+            margin-top: 15px;
+            font-size: 16px;
             color: green;
         }
-        /* Style for the content container */
         #protected-content {
             display: none; /* Hide the content by default */
+        }
+        /* Style for the password prompt message */
+        #initial-message h1 {
+            color: #333;
+        }
+
+        /* Media Query for smaller screens (e.g., phones) */
+        @media (max-width: 600px) {
+            #content-wrapper {
+                margin: 10px;
+                padding: 15px;
+            }
+            button {
+                padding: 15px;
+                font-size: 16px;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="protected-content">
-        <h2>Printer Command Panel</h2>
-        <input id="text" type="text" placeholder="Enter text to print">
-        <button onclick="sendText()">Send</button>
-        <div id="status"></div>
+    <div id="content-wrapper">
+        <div id="protected-content">
+            <h2>Thank you</h2>
+            <input id="text" type="text" placeholder="Type here">
+            <button onclick="sendText()">Send</button>
+            <div id="status"></div>
+        </div>
+        
+        <div id="initial-message"><h1>Access Verification</h1><p>Please wait for the password prompt...</p></div>
     </div>
-    
-    <div id="initial-message">Loading access check...</div>
 
     <script>
         // ⚠️ WARNING: This is NOT secure. The password is visible in the source code.
-        const CORRECT_PASSWORD = "0000"; // **CHANGE THIS PASSWORD!**
+        const CORRECT_PASSWORD = "0000"; // Changed to 0000 as requested
         const protectedContent = document.getElementById('protected-content');
         const initialMessage = document.getElementById('initial-message');
 
@@ -66,22 +100,24 @@
             // Hide the initial message while prompting
             initialMessage.style.display = 'none'; 
 
-            const passwordAttempt = prompt("Please enter the password to view this page:");
+            const passwordAttempt = prompt("Please enter the 4-digit password:");
 
             if (passwordAttempt === CORRECT_PASSWORD) {
                 // Password is correct: hide prompt message and display the content
                 protectedContent.style.display = 'block'; 
+                document.getElementById('content-wrapper').style.maxWidth = '500px'; // Set max width for main content
             } else if (passwordAttempt !== null) {
                 // Incorrect: Show error and re-prompt
                 alert("Incorrect Password. Access Denied.");
                 checkAccess(); 
             } else {
                 // User clicked "Cancel" or pressed Esc
-                document.body.innerHTML = "<h1>Access Denied.</h1><p>You must enter the correct password to continue.</p>";
+                initialMessage.innerHTML = "<h1>Access Denied.</h1><p>You must enter the correct password to continue.</p>";
+                initialMessage.style.display = 'block';
             }
         }
 
-        // --- Your original sendText function ---
+        // --- Original sendText function ---
         function sendText() {
             const text = document.getElementById('text').value.trim();
             if (!text) {
