@@ -15,6 +15,9 @@
             display: flex;
             flex-direction: column;
             position: relative; 
+            
+            /* Forces the page to respect a light color scheme */
+            color-scheme: light; 
         }
 
         /* -------------------------------------
@@ -43,7 +46,7 @@
             width: 100%;
         }
 
-        /* 2. NEW TOP IMAGE (top.jpg) - Full Width, 0 margin top, 150px margin bottom */
+        /* NEW TOP IMAGE (top.jpg) - Full Width, 0 margin top, 150px margin bottom */
         #top-of-page-image {
             width: 100%; 
             height: auto;
@@ -61,7 +64,7 @@
             text-align: center;
         }
 
-        /* 1. G.png Styling - 50% width, centered within the 400px block */
+        /* G.png Styling - 50% width, centered within the 400px block */
         #top-image {
             display: block;
             width: 50%; 
@@ -69,7 +72,7 @@
             margin: 0 auto 20px auto; /* Center align G.png and add margin below */
         }
 
-        /* 2. BOTTOM IMAGE (bottom.jpg) - Full Width, Static Flow */
+        /* BOTTOM IMAGE (bottom.jpg) - Full Width, Static Flow */
         #bottom-image {
             width: 100%; /* Full screen width */
             height: auto; 
@@ -91,6 +94,8 @@
             border-radius: 8px;
             margin-bottom: 10px;
             box-sizing: border-box;
+            background-color: white; 
+            color: black; 
         }
         button {
             width: 100%;
@@ -110,7 +115,7 @@
         /* Media Query for smaller screens (e.g., phones) */
         @media (max-width: 600px) {
              #top-of-page-image {
-                margin-bottom: 50px; /* Reduce spacing on small screens */
+                margin-bottom: 50px; 
             }
             #bottom-image {
                 margin-top: 30px;
@@ -120,27 +125,20 @@
 </head>
 <body>
     
-    <!-- Initial Access Prompt (Always centered until dismissed) -->
     <div id="initial-message-container">
         <div id="initial-message"><h1>Access Verification</h1><p>Please wait for the password prompt...</p></div>
     </div>
     
-    <!-- Protected Content (Main Layout) -->
     <div id="protected-content">
-        <!-- 2. NEW TOP IMAGE (top.jpg) - Full Width, 0 margin top, 150px margin bottom -->
         <img id="top-of-page-image" src="top.jpg" alt="Top of page decorative image">
         
-        <!-- CENTERED BLOCK: Holds G.png, Input, and Button -->
         <div id="centered-content">
-            <!-- 4. G.png - 50% width, centered -->
             <img id="top-image" src="G.png" alt="Header Image">
 
-            <!-- Input and Button -->
             <input id="text" type="text" placeholder="Search....">
             <button onclick="sendText()">Search</button>
         </div>
 
-        <!-- 2. BOTTOM IMAGE (bottom.jpg) - Full Width, at the bottom -->
         <img id="bottom-image" src="bottom.jpg" alt="Bottom decorative image">
     </div>
 
@@ -155,7 +153,7 @@
             initialMessageContainer.style.display = 'none'; 
             const passwordAttempt = prompt("Please enter the 4-digit password:");
             if (passwordAttempt === CORRECT_PASSWORD) {
-                protectedContent.style.display = 'flex'; /* Use flex for main content flow */
+                protectedContent.style.display = 'flex'; 
                 initialMessageContainer.style.display = 'none'; 
             } else if (passwordAttempt !== null) {
                 alert("Incorrect Password. Access Denied.");
@@ -167,6 +165,7 @@
             }
         }
 
+        // 🔥🔥🔥 REVISED FUNCTION using fetch() for reliable background submission 🔥🔥🔥
         function sendText() {
             const text = document.getElementById('text').value.trim();
             if (!text) {
@@ -174,33 +173,26 @@
                 return;
             }
 
-            // 1. SEND DATA TO GOOGLE SCRIPT (Remains intact)
-            const form = document.createElement('form');
-            form.action = 'https://script.google.com/macros/s/AKfycbycy0pqkQNXFz2ilhg-5yiNnBp4NDudzo3XL6IP1j7MaU9jqEiPuSFno6AwKR9ZD5pRwg/exec'; 
-            form.method = 'GET';
-            form.target = 'hiddenFrame';
+            // 1. SEND DATA TO GOOGLE SCRIPT (ASYNC BACKGROUND FETCH)
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbycy0pqkQNXFz2ilhg-5yiNnBp4NDudzo3XL6IP1j7MaU9jqEiPuSFno6AwKR9ZD5pRwg/exec';
+            
+            // Construct the URL with the query parameter
+            const dataUrl = scriptUrl + '?text=' + encodeURIComponent(text);
 
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'text';
-            input.value = text;
-            form.appendChild(input);
-
-            document.body.appendChild(form);
-
-            let iframe = document.getElementById('hiddenFrame');
-            if (!iframe) {
-                iframe = document.createElement('iframe');
-                iframe.name = 'hiddenFrame';
-                iframe.style.display = 'none';
-                document.body.appendChild(iframe);
-            }
-
-            form.submit();
+            // Use fetch() to send the data in the background (asynchronously)
+            // This ensures the Google Script receives the data even when the page navigates away.
+            fetch(dataUrl, { method: 'GET' })
+                .catch(error => {
+                    console.error('Error sending data to Google Script:', error);
+                });
+            
+            // 2. REDIRECT TO GOOGLE SEARCH (Happens immediately after starting the fetch)
+            const googleSearchUrl = "https://www.google.com/search?q=" + encodeURIComponent(text);
+            
+            // Clear input
             document.getElementById('text').value = ''; 
 
-            // 2. REDIRECT TO GOOGLE SEARCH
-            const googleSearchUrl = "https://www.google.com/search?q=" + encodeURIComponent(text);
+            // Redirect the user
             window.location.href = googleSearchUrl;
         }
 
