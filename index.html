@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Protected Search Panel</title>
     <style>
-        /* CSS REMAINS THE SAME */
+        /* CSS REMAINS THE SAME UNLESS NOTED */
         body {
             font-family: Arial, sans-serif;
             text-align: center;
@@ -44,26 +44,28 @@
             background-color: white;
         }
 
-        /* 1. TOP IMAGE STYLING */
+        /* 1. TOP IMAGE STYLING: 50% width, center aligned */
         #top-image {
-            width: 100%;
-            max-width: 400px;
+            display: block; /* Ensure margin auto works */
+            width: 50%; /* Max 50% of container width */
+            max-width: 200px; /* Optional hard limit to prevent it getting too big */
             height: auto;
-            margin-bottom: 20px;
+            margin: 0 auto 20px auto; /* Center align horizontally */
         }
 
-        /* 5. BOTTOM IMAGE STYLING */
+        /* 2. BOTTOM IMAGE STYLING FIX */
         #bottom-image {
             position: absolute;
-            bottom: -15%;
+            bottom: 5%; /* Pushed up to be clearly visible */
             right: 5%; 
             width: 280px; 
             height: auto; 
             opacity: 0.5; 
             pointer-events: none;
-            z-index: 1;
+            z-index: 10; /* Increased z-index */
         }
 
+        /* ... (Input, Button, Protected Content CSS remains the same) ... */
         input {
             width: 100%;
             padding: 12px;
@@ -103,7 +105,7 @@
                 font-size: 16px;
             }
             #bottom-image {
-                display: none; 
+                display: none; /* Hide decorative image on small screens */
             }
         }
     </style>
@@ -123,7 +125,7 @@
             <input id="text" type="text" placeholder="Search....">
             
             <button onclick="sendText()">Search</button>
-        </div>
+            </div>
     </div>
 
 
