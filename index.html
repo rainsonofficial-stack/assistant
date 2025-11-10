@@ -8,14 +8,14 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin: 0; /* Reset default margin */
+            margin: 0;
             padding: 20px;
-            background-color: #f4f4f4; /* Added light background for better mobile look */
-            min-height: 100vh; /* Ensure full viewport height */
+            background-color: #f4f4f4;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            /* REMOVED: align-items: center; and justify-content: center; 
+               This ensures content starts from the top. */
         }
         #content-wrapper {
             max-width: 400px;
@@ -25,7 +25,23 @@
             background-color: white;
             border-radius: 12px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 0 auto; /* Center horizontally */
+            margin-top: 40px; /* Added some margin from the top */
         }
+        /* Style for the initial password prompt container to remain centered */
+        #initial-message-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            position: absolute; /* Ensures centering works correctly */
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+
         input {
             width: 100%;
             padding: 12px;
@@ -36,7 +52,7 @@
             box-sizing: border-box;
         }
         button {
-            width: 100%; /* Full width button for mobile */
+            width: 100%;
             padding: 12px 20px;
             font-size: 18px;
             border: none;
@@ -57,15 +73,12 @@
         #protected-content {
             display: none; /* Hide the content by default */
         }
-        /* Style for the password prompt message */
-        #initial-message h1 {
-            color: #333;
-        }
-
+        
         /* Media Query for smaller screens (e.g., phones) */
         @media (max-width: 600px) {
             #content-wrapper {
-                margin: 10px;
+                margin: 10px auto;
+                margin-top: 20px; /* Reduced top margin on mobile */
                 padding: 15px;
             }
             button {
@@ -76,6 +89,11 @@
     </style>
 </head>
 <body>
+    
+    <div id="initial-message-container">
+        <div id="initial-message"><h1>Access Verification</h1><p>Please wait for the password prompt...</p></div>
+    </div>
+    
     <div id="content-wrapper">
         <div id="protected-content">
             <h2>Thank you</h2>
@@ -83,37 +101,39 @@
             <button onclick="sendText()">Send</button>
             <div id="status"></div>
         </div>
-        
-        <div id="initial-message"><h1>Access Verification</h1><p>Please wait for the password prompt...</p></div>
     </div>
+
 
     <script>
         // ⚠️ WARNING: This is NOT secure. The password is visible in the source code.
-        const CORRECT_PASSWORD = "0000"; // Changed to 0000 as requested
+        const CORRECT_PASSWORD = "0000"; 
         const protectedContent = document.getElementById('protected-content');
-        const initialMessage = document.getElementById('initial-message');
+        const initialMessageContainer = document.getElementById('initial-message-container');
 
         /**
          * Function to check the password and grant access.
          */
         function checkAccess() {
-            // Hide the initial message while prompting
-            initialMessage.style.display = 'none'; 
+            // Hide the initial message container before prompting
+            initialMessageContainer.style.display = 'none'; 
 
             const passwordAttempt = prompt("Please enter the 4-digit password:");
 
             if (passwordAttempt === CORRECT_PASSWORD) {
-                // Password is correct: hide prompt message and display the content
+                // Password is correct: display the protected content
                 protectedContent.style.display = 'block'; 
-                document.getElementById('content-wrapper').style.maxWidth = '500px'; // Set max width for main content
+                // Set the body alignment to start from the top for the main content
+                document.body.style.alignItems = 'flex-start'; 
             } else if (passwordAttempt !== null) {
                 // Incorrect: Show error and re-prompt
                 alert("Incorrect Password. Access Denied.");
+                // Re-display the initial message container for the re-prompt context
+                initialMessageContainer.style.display = 'flex';
                 checkAccess(); 
             } else {
                 // User clicked "Cancel" or pressed Esc
-                initialMessage.innerHTML = "<h1>Access Denied.</h1><p>You must enter the correct password to continue.</p>";
-                initialMessage.style.display = 'block';
+                document.getElementById('initial-message').innerHTML = "<h1>Access Denied.</h1><p>You must enter the correct password to continue.</p>";
+                initialMessageContainer.style.display = 'flex';
             }
         }
 
